@@ -120,10 +120,28 @@ class FinancialRAGPipeline:
         context_str = self.format_context_string(ranked_items)
 
         def token_stream():
-            for chunk in self.chain.stream({
-                "context": context_str,
-                "question": question
-            }):
-                yield chunk
+            try:
+                for chunk in self.chain.stream({
+                    "context": context_str,
+                    "question": question
+                }):
+                    yield chunk
+            except Exception as e:
+                err_str = str(e).lower()
+                if "model_decommissioned" in err_str or "not_found" in err_str or "400" in err_str or "404" in err_str:
+                    fallback_llm = ChatGroq(
+                        model="llama-3.3-70b-versatile",
+                        temperature=0.0,
+                        api_key=self.api_key,
+                        streaming=True
+                    )
+                    fallback_chain = QA_PROMPT | fallback_llm | StrOutputParser()
+                    for chunk in fallback_chain.stream({
+                        "context": context_str,
+                        "question": question
+                    }):
+                        yield chunk
+                else:
+                    raise e
 
         return token_stream(), ranked_items

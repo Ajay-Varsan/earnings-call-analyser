@@ -128,6 +128,20 @@ If any specific metric is not explicitly stated, mark it as "Not Disclosed". Do 
         parsed = json.loads(response.content)
         return parsed
     except Exception as e:
+        # Automatic fallback if requested model was decommissioned or unavailable
+        if model_name != "llama-3.3-70b-versatile":
+            try:
+                fallback_llm = ChatGroq(
+                    model="llama-3.3-70b-versatile",
+                    temperature=0.0,
+                    api_key=api_key,
+                    model_kwargs={"response_format": {"type": "json_object"}}
+                )
+                fb_resp = fallback_llm.invoke(messages)
+                return json.loads(fb_resp.content)
+            except Exception:
+                pass
+
         return {
             "company_name": "Analysis Incomplete",
             "period": "N/A",

@@ -183,6 +183,26 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+@st.cache_data(ttl=300, show_spinner=False)
+def fetch_live_groq_models(key: str) -> List[str]:
+    """Dynamically query Groq API to retrieve only currently active production models."""
+    fallback_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
+    if not key or not key.startswith("gsk_"):
+        return fallback_models
+    try:
+        from groq import Groq
+        client = Groq(api_key=key)
+        model_list = client.models.list()
+        active = [
+            m.id for m in model_list.data
+            if not any(k in m.id.lower() for k in ["whisper", "tts", "embedding", "guard", "vision"])
+        ]
+        # Prioritize production / llama-3.3 models
+        active.sort(key=lambda name: (0 if "llama-3.3" in name else 1 if "llama-3.1" in name else 2, name))
+        return active if active else fallback_models
+    except Exception:
+        return fallback_models
+
 # Sidebar Controls
 with st.sidebar:
     st.markdown("### 🔑 API Configuration")
@@ -195,18 +215,12 @@ with st.sidebar:
         help="Get your 100% free API key from https://console.groq.com"
     )
 
-    groq_models = [
-        "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant",
-        "llama3-70b-8192",
-        "llama3-8b-8192",
-        "mixtral-8x7b-32768"
-    ]
+    available_groq_models = fetch_live_groq_models(api_key)
     groq_model = st.selectbox(
         "Groq LLM Model",
-        groq_models,
+        available_groq_models,
         index=0,
-        help="llama-3.3-70b-versatile is the current flagship production model on Groq."
+        help="Dynamically verified active models on your Groq account."
     )
 
     st.markdown("---")
