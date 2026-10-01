@@ -1,0 +1,50 @@
+[
+  {
+    "id": "q1",
+    "question": "What was the total reported revenue in Q3 FY25 and its year-over-year growth percentage?",
+    "ground_truth": "Total revenue was $35,082 million (or $35.1 billion), up 93.6% (or 94%) year-over-year.",
+    "expected_keywords": ["$35.1 billion", "$35,082M", "94%", "93.6%"]
+  },
+  {
+    "id": "q2",
+    "question": "How much revenue did the Data Center segment generate, and what percentage of total revenue did it represent?",
+    "ground_truth": "Data Center revenue was $30.8 billion (or $30,771 million), representing 88% of total revenue.",
+    "expected_keywords": ["$30.8 billion", "$30,771M", "88%"]
+  },
+  {
+    "id": "q3",
+    "question": "What was the Non-GAAP diluted EPS for Q3 FY25 compared to Q3 FY24?",
+    "ground_truth": "Non-GAAP diluted EPS was $0.81 in Q3 FY25 compared to $0.40 in Q3 FY24, an increase of 102.5%.",
+    "expected_keywords": ["$0.81", "$0.40", "102.5%"]
+  },
+  {
+    "id": "q4",
+    "question": "What is the revenue guidance for Q4 fiscal 2025?",
+    "ground_truth": "Revenue for Q4 FY25 is expected to be $37.5 billion, plus or minus 2%.",
+    "expected_keywords": ["$37.5 billion", "2%"]
+  },
+  {
+    "id": "q5",
+    "question": "Why is the Q4 gross margin guided down sequentially, and what is the expected trough margin?",
+    "ground_truth": "Non-GAAP gross margin is guided to 73.5% (a 150 bps sequential compression) representing the trough due to initial production ramp costs of next-gen systems before yield maturity.",
+    "expected_keywords": ["73.5%", "150 bps", "ramp", "trough"]
+  },
+  {
+    "id": "q6",
+    "question": "How much cash did the company return to shareholders in Q3, and what new share repurchase authorization was approved?",
+    "ground_truth": "The company returned $11.2 billion to shareholders and the Board authorized an additional $50 billion share repurchase authorization.",
+    "expected_keywords": ["$11.2 billion", "$50 billion"]
+  },
+  {
+    "id": "q7",
+    "question": "What was Free Cash Flow in Q3 FY25, and how did it change year-over-year?",
+    "ground_truth": "Free Cash Flow was $16,788 million, up 138.4% year-over-year from $7,042 million.",
+    "expected_keywords": ["$16,788M", "138.4%", "$7,042M"]
+  },
+  {
+    "id": "q8",
+    "question": "What was the ending inventory value and days of inventory at the end of the quarter?",
+    "ground_truth": "Ending inventory was $7.7 billion, representing 64 days of inventory, down from 71 days.",
+    "expected_keywords": ["$7.7 billion", "64 days", "71 days"]
+  }
+]

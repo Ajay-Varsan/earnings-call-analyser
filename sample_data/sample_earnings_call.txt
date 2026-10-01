@@ -1,0 +1,64 @@
+# NOVA SEMICONDUCTOR CORP. (NASDAQ: NVSC)
+## Q3 FISCAL 2025 FINANCIAL RESULTS & EARNINGS CONFERENCE CALL
+Date: November 20, 2024
+Speakers:
+- Elena Vance, Chief Executive Officer
+- Marcus Chen, Chief Financial Officer
+- Sarah Jenkins, Head of Investor Relations
+
+---
+
+### PREPARED REMARKS: FINANCIAL HIGHLIGHTS
+
+Elena Vance, CEO:
+"Good afternoon, and thank you for joining us today. I am thrilled to report another record quarter for Nova Semiconductor. For the third quarter of fiscal 2025, Nova achieved record revenue of $35.1 billion, up 94% year-over-year and up 17% sequentially, exceeding the high end of our outlook range. 
+
+Our Data Center revenue hit an all-time record of $30.8 billion, representing 88% of total revenue and surging 112% from the year-ago quarter. Compute demand for our next-generation architecture remains unprecedented. Across cloud hyperscalers and sovereign AI initiatives, compute utilization is running at near 100% capacity."
+
+### CONSOLIDATED GAAP TO NON-GAAP RECONCILIATIONS (TABLE)
+
+| Metric | Q3 FY25 (Reported) | Q3 FY24 (Prior Year) | YoY Change (%) | Q2 FY25 (Sequential) |
+| --- | --- | --- | --- | --- |
+| Total Revenue | $35,082M | $18,120M | +93.6% | $30,040M |
+| Data Center Revenue | $30,771M | $14,514M | +112.0% | $26,272M |
+| Gaming & AI PC Revenue | $3,279M | $2,856M | +14.8% | $2,880M |
+| Professional Visualization | $486M | $416M | +16.8% | $454M |
+| Automotive & Robotics | $546M | $334M | +63.5% | $434M |
+| GAAP Gross Margin | 74.6% | 74.0% | +60 bps | 75.1% |
+| Non-GAAP Gross Margin | 75.0% | 75.0% | Flat | 75.7% |
+| GAAP Operating Income | $21,869M | $10,417M | +109.9% | $18,642M |
+| GAAP Diluted EPS | $0.78 | $0.37 | +110.8% | $0.67 |
+| Non-GAAP Diluted EPS | $0.81 | $0.40 | +102.5% | $0.68 |
+| Free Cash Flow | $16,788M | $7,042M | +138.4% | $13,483M |
+
+---
+
+### CFO FINANCIAL REVIEW & OUTLOOK
+
+Marcus Chen, CFO:
+"Turning to our balance sheet and capital allocation: Cash, cash equivalents, and marketable securities stood at $38.5 billion at the end of the quarter. During Q3, we returned $11.2 billion to shareholders through share repurchases and cash dividends. Our Board of Directors has authorized an additional $50 billion share repurchase authorization.
+
+Capital expenditures were $3.1 billion, and operating cash flows totaled $17.6 billion. Inventory ended at $7.7 billion, representing 64 days of inventory, down from 71 days last quarter.
+
+### OUTLOOK FOR Q4 FISCAL 2025:
+- Revenue is expected to be $37.5 billion, plus or minus 2%.
+- GAAP and non-GAAP gross margins are expected to be 73.0% and 73.5%, respectively, plus or minus 50 basis points. The sequential margin compression of ~150 bps reflects the initial production ramp costs of our next-gen Blackwell systems before yield maturity.
+- GAAP operating expenses are expected to be approximately $4.8 billion.
+- Capital expenditures for the full fiscal year 2025 are projected at approximately $12.0 billion.
+- The tax rate is projected to be 16.5%, plus or minus 1%."
+
+---
+
+### ANALYST QUESTION & ANSWER SESSION
+
+Vivek Arya (Bank of America):
+"Thank you and congratulations on the exceptional results. Elena, could you talk about the supply constraints on the next-gen architecture? Are you seeing any thermal or packaging bottlenecks at TSMC with CoWoS packaging?"
+
+Elena Vance, CEO:
+"Thank you, Vivek. Demand for our systems is extraordinarily high. We have shipped over 13,000 engineering samples to customers globally. Packaging capacity with our foundry partners, particularly CoWoS-L packaging, has scaled significantly over the last two quarters. While demand will continue to exceed supply for several quarters into fiscal 2026, we do not see any architectural or thermal design flaws. Yields are ramping in line with our internal models."
+
+Toshiya Hari (Goldman Sachs):
+"Marcus, on gross margins: you guided Q4 gross margin down to 73.5% non-GAAP. How should we think about gross margin trajectory as Blackwell volumes ramp in the first half of FY26?"
+
+Marcus Chen, CFO:
+"Great question, Toshiya. As with any major node transition, gross margins take a slight hit in the first one or two ramp quarters due to early wafer scrap rates and assembly startup expenses. We expect Q4 to represent the trough in gross margin at around 73.5%, and we anticipate margins will expand back toward the mid-70s range (around 75.0%) by Q2 of fiscal 2026 as production yields normalize."
