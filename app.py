@@ -178,7 +178,7 @@ st.markdown("""
         </div>
     </div>
     <div>
-        <span class="terminal-badge">ENGINE: GROQ LLAMA-3.1</span>
+        <span class="terminal-badge">ENGINE: GROQ ENTERPRISE</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -186,7 +186,7 @@ st.markdown("""
 @st.cache_data(ttl=300, show_spinner=False)
 def fetch_live_groq_models(key: str) -> List[str]:
     """Dynamically query Groq API to retrieve only currently active production models."""
-    fallback_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
+    fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]
     if not key or not key.startswith("gsk_"):
         return fallback_models
     try:
@@ -197,8 +197,24 @@ def fetch_live_groq_models(key: str) -> List[str]:
             m.id for m in model_list.data
             if not any(k in m.id.lower() for k in ["whisper", "tts", "embedding", "guard", "vision"])
         ]
-        # Prioritize production / llama-3.3 models
-        active.sort(key=lambda name: (0 if "llama-3.3" in name else 1 if "llama-3.1" in name else 2, name))
+        
+        def model_priority(m_id: str) -> int:
+            name = m_id.lower()
+            if "gpt-oss-120b" in name:
+                return 0
+            if "gpt-oss-20b" in name:
+                return 1
+            if "qwen" in name:
+                return 2
+            if "orpheus-v1-english" in name:
+                return 3
+            if "llama" in name:
+                return 4
+            if "allam" in name or "arabic" in name:
+                return 99  # Push regional/Arabic language models to bottom
+            return 10
+
+        active.sort(key=lambda name: (model_priority(name), name))
         return active if active else fallback_models
     except Exception:
         return fallback_models

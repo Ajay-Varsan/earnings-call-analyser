@@ -48,7 +48,7 @@ class FinancialRAGPipeline:
         self,
         retriever: HybridVectorBM25Retriever,
         api_key: str,
-        model_name: str = "llama-3.3-70b-versatile",
+        model_name: str = "openai/gpt-oss-120b",
         reranker_model: str = "ms-marco-TinyBERT-L-2-v2"
     ):
         self.retriever = retriever
@@ -128,20 +128,24 @@ class FinancialRAGPipeline:
                     yield chunk
             except Exception as e:
                 err_str = str(e).lower()
-                if "model_decommissioned" in err_str or "not_found" in err_str or "400" in err_str or "404" in err_str:
-                    fallback_llm = ChatGroq(
-                        model="llama-3.3-70b-versatile",
-                        temperature=0.0,
-                        api_key=self.api_key,
-                        streaming=True
-                    )
-                    fallback_chain = QA_PROMPT | fallback_llm | StrOutputParser()
-                    for chunk in fallback_chain.stream({
-                        "context": context_str,
-                        "question": question
-                    }):
-                        yield chunk
-                else:
-                    raise e
+                if any(x in err_str for x in ["model_decommissioned", "not_found", "400", "404"]):
+                    for fb_model in ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]:
+                        try:
+                            fallback_llm = ChatGroq(
+                                model=fb_model,
+                                temperature=0.0,
+                                api_key=self.api_key,
+                                streaming=True
+                            )
+                            fallback_chain = QA_PROMPT | fallback_llm | StrOutputParser()
+                            for chunk in fallback_chain.stream({
+                                "context": context_str,
+                                "question": question
+                            }):
+                                yield chunk
+                            return
+                        except Exception:
+                            continue
+                raise e
 
         return token_stream(), ranked_items

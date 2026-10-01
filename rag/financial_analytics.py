@@ -58,22 +58,28 @@ def audit_numerical_grounding(answer: str, context_chunks: List[Document]) -> Di
     }
 
 
+def _parse_json_resilient(text: str) -> Dict[str, Any]:
+    """Parse JSON directly or extract it from markdown fenced blocks/braces."""
+    text = text.strip()
+    try:
+        return json.loads(text)
+    except Exception:
+        # Try extracting JSON block between { and }
+        match = re.search(r"(\{.*\})", text, re.DOTALL)
+        if match:
+            return json.loads(match.group(1))
+        raise ValueError("No valid JSON structure found in LLM response.")
+
+
 def extract_executive_scorecard(
     full_text_or_chunks: List[Document],
     api_key: str,
-    model_name: str = "llama-3.3-70b-versatile"
+    model_name: str = "openai/gpt-oss-120b"
 ) -> Dict[str, Any]:
     """
     Extract structured executive KPI scorecard and Bull/Bear takeaways
-    using JSON mode inference.
+    using JSON mode or regex extraction fallback.
     """
-    llm = ChatGroq(
-        model=model_name,
-        temperature=0.0,
-        api_key=api_key,
-        model_kwargs={"response_format": {"type": "json_object"}}
-    )
-
     # Sample top chunks covering overview, tables, and guidance
     sample_texts = []
     total_len = 0
@@ -87,11 +93,11 @@ def extract_executive_scorecard(
 
     system_prompt = """You are a senior Wall Street equity research analyst.
 Extract key financial facts and KPIs from the provided earnings call or financial report.
-You must return valid JSON only matching the exact schema below:
+Return ONLY valid JSON matching this schema:
 
 {
-  "company_name": "Company Name (e.g. Nvidia Corp)",
-  "period": "Period (e.g. Q3 FY2025)",
+  "company_name": "Company Name",
+  "period": "Quarter / Fiscal Year",
   "financial_kpis": {
     "revenue": "Reported Revenue with YoY %",
     "eps": "Reported EPS (GAAP / Non-GAAP)",
@@ -123,40 +129,52 @@ If any specific metric is not explicitly stated, mark it as "Not Disclosed". Do 
         HumanMessage(content=f"Context from earnings document:\n\n{context_prompt}")
     ]
 
-    try:
-        response = llm.invoke(messages)
-        parsed = json.loads(response.content)
-        return parsed
-    except Exception as e:
-        # Automatic fallback if requested model was decommissioned or unavailable
-        if model_name != "llama-3.3-70b-versatile":
-            try:
-                fallback_llm = ChatGroq(
-                    model="llama-3.3-70b-versatile",
-                    temperature=0.0,
-                    api_key=api_key,
-                    model_kwargs={"response_format": {"type": "json_object"}}
-                )
-                fb_resp = fallback_llm.invoke(messages)
-                return json.loads(fb_resp.content)
-            except Exception:
-                pass
+    candidate_models = [model_name, "openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]
+    # Remove duplicates preserving order
+    candidate_models = list(dict.fromkeys(candidate_models))
 
-        return {
-            "company_name": "Analysis Incomplete",
-            "period": "N/A",
-            "financial_kpis": {
-                "revenue": "Error parsing",
-                "eps": "Error parsing",
-                "gross_margin": "Error parsing",
-                "operating_income": "Error parsing",
-                "cash_position": "Error parsing"
-            },
-            "guidance": {"next_quarter_revenue": "N/A", "outlook_summary": str(e)},
-            "bull_case_takeaways": [f"Could not extract: {str(e)}"],
-            "bear_case_risks": ["Could not extract"],
-            "executive_sentiment": "Undetermined"
-        }
+    last_error = ""
+    for candidate in candidate_models:
+        # 1. Try with response_format
+        try:
+            llm = ChatGroq(
+                model=candidate,
+                temperature=0.0,
+                api_key=api_key,
+                model_kwargs={"response_format": {"type": "json_object"}}
+            )
+            resp = llm.invoke(messages)
+            return _parse_json_resilient(resp.content)
+        except Exception as e1:
+            last_error = str(e1)
+
+        # 2. Try without response_format (plain text prompt with JSON extraction)
+        try:
+            llm = ChatGroq(
+                model=candidate,
+                temperature=0.0,
+                api_key=api_key
+            )
+            resp = llm.invoke(messages)
+            return _parse_json_resilient(resp.content)
+        except Exception as e2:
+            last_error = str(e2)
+
+    return {
+        "company_name": "Analysis Incomplete",
+        "period": "N/A",
+        "financial_kpis": {
+            "revenue": "Error parsing",
+            "eps": "Error parsing",
+            "gross_margin": "Error parsing",
+            "operating_income": "Error parsing",
+            "cash_position": "Error parsing"
+        },
+        "guidance": {"next_quarter_revenue": "N/A", "outlook_summary": last_error},
+        "bull_case_takeaways": [f"Could not extract: {last_error}"],
+        "bear_case_risks": ["Could not extract"],
+        "executive_sentiment": "Undetermined"
+    }
 
 
 def generate_comparative_analysis(
