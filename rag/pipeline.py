@@ -48,7 +48,7 @@ class FinancialRAGPipeline:
         self,
         retriever: HybridVectorBM25Retriever,
         api_key: str,
-        model_name: str = "llama-3.1-8b-instant",
+        model_name: str = "llama-3.3-70b-versatile",
         reranker_model: str = "ms-marco-TinyBERT-L-2-v2"
     ):
         self.retriever = retriever

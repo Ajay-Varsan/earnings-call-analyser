@@ -195,6 +195,20 @@ with st.sidebar:
         help="Get your 100% free API key from https://console.groq.com"
     )
 
+    groq_models = [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "llama3-70b-8192",
+        "llama3-8b-8192",
+        "mixtral-8x7b-32768"
+    ]
+    groq_model = st.selectbox(
+        "Groq LLM Model",
+        groq_models,
+        index=0,
+        help="llama-3.3-70b-versatile is the current flagship production model on Groq."
+    )
+
     st.markdown("---")
     st.markdown("### 📂 Document Ingestion")
 
@@ -376,36 +390,41 @@ with tab1:
                     st.write(prompt_to_run)
 
                 with st.chat_message("assistant"):
-                    pipeline = FinancialRAGPipeline(
-                        retriever=st.session_state.retriever,
-                        api_key=api_key
-                    )
-                    stream_gen, ranked_items = pipeline.stream_query(prompt_to_run)
-                    
-                    full_answer = st.write_stream(stream_gen)
-                    source_docs = [item[0] for item in ranked_items]
-                    audit = audit_numerical_grounding(full_answer, source_docs)
+                    try:
+                        pipeline = FinancialRAGPipeline(
+                            retriever=st.session_state.retriever,
+                            api_key=api_key,
+                            model_name=groq_model
+                        )
+                        stream_gen, ranked_items = pipeline.stream_query(prompt_to_run)
+                        
+                        full_answer = st.write_stream(stream_gen)
+                        source_docs = [item[0] for item in ranked_items]
+                        audit = audit_numerical_grounding(full_answer, source_docs)
 
-                    # Show audit badge
-                    g_score = audit.get("grounding_score_pct", 100.0)
-                    is_safe = audit.get("is_safe", True)
-                    css_cls = "grounding-box" if is_safe else "grounding-box warning"
-                    flag = "🛡️ Verified Grounded" if is_safe else "⚠️ Partial Grounding Discrepancy"
-                    st.markdown(
-                        f"""<div class="{css_cls}">
-                            <b>{flag}</b> | Numerical Confidence: <b>{g_score}%</b> 
-                            ({len(audit.get('verified_figures', []))} verified, {len(audit.get('unverified_figures', []))} unverified claims)
-                        </div>""",
-                        unsafe_allow_html=True
-                    )
+                        # Show audit badge
+                        g_score = audit.get("grounding_score_pct", 100.0)
+                        is_safe = audit.get("is_safe", True)
+                        css_cls = "grounding-box" if is_safe else "grounding-box warning"
+                        flag = "🛡️ Verified Grounded" if is_safe else "⚠️ Partial Grounding Discrepancy"
+                        st.markdown(
+                            f"""<div class="{css_cls}">
+                                <b>{flag}</b> | Numerical Confidence: <b>{g_score}%</b> 
+                                ({len(audit.get('verified_figures', []))} verified, {len(audit.get('unverified_figures', []))} unverified claims)
+                            </div>""",
+                            unsafe_allow_html=True
+                        )
 
-                    st.session_state.chat_history.append({
-                        "question": prompt_to_run,
-                        "answer": full_answer,
-                        "ranked_items": ranked_items,
-                        "audit": audit
-                    })
-                    st.rerun()
+                        st.session_state.chat_history.append({
+                            "question": prompt_to_run,
+                            "answer": full_answer,
+                            "ranked_items": ranked_items,
+                            "audit": audit
+                        })
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Groq API Error: {str(e)}")
+                        st.info("Tip: Try switching to **'llama-3.3-70b-versatile'** or **'llama3-70b-8192'** in the sidebar model dropdown.")
 
 # ----------------- TAB 2: Executive Scorecard & KPIs -----------------
 with tab2:
@@ -419,7 +438,8 @@ with tab2:
                 with st.spinner("Extracting structured financial metrics via JSON Mode LLM..."):
                     scorecard = extract_executive_scorecard(
                         st.session_state.all_chunks,
-                        api_key=api_key
+                        api_key=api_key,
+                        model_name=groq_model
                     )
                     st.session_state.scorecard = scorecard
                     st.rerun()
@@ -533,7 +553,8 @@ with tab3:
                     doc2_name=doc2_title,
                     doc2_chunks=d2_docs,
                     api_key=api_key,
-                    comparison_topic=topic
+                    comparison_topic=topic,
+                    model_name=groq_model
                 )
                 st.markdown(report)
 

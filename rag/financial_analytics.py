@@ -61,7 +61,7 @@ def audit_numerical_grounding(answer: str, context_chunks: List[Document]) -> Di
 def extract_executive_scorecard(
     full_text_or_chunks: List[Document],
     api_key: str,
-    model_name: str = "llama-3.1-8b-instant"
+    model_name: str = "llama-3.3-70b-versatile"
 ) -> Dict[str, Any]:
     """
     Extract structured executive KPI scorecard and Bull/Bear takeaways
@@ -152,7 +152,7 @@ def generate_comparative_analysis(
     doc2_chunks: List[Document],
     api_key: str,
     comparison_topic: str = "Financial Performance, Guidance & Margin Variance",
-    model_name: str = "llama-3.1-8b-instant"
+    model_name: str = "llama-3.3-70b-versatile"
 ) -> str:
     """
     Perform a comparative variance analysis between two documents
